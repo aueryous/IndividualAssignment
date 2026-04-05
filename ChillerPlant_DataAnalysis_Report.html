@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Chilled Water Plant – Data Exploration &amp; AI Analysis</title>
+<style>
+  body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.6;
+    color: #1a1a1a;
+    margin: 0;
+    padding: 0;
+  }
+  .cover {
+    page-break-after: always;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 120px 60px 80px 60px;
+    background: #1a3a5c;
+    color: #ffffff;
+    min-height: 90vh;
+  }
+  .cover h1 {
+    font-size: 26pt;
+    font-weight: 700;
+    margin: 0 0 20px 0;
+    line-height: 1.3;
+  }
+  .cover .subtitle {
+    font-size: 14pt;
+    color: #a8c8e8;
+    margin-bottom: 60px;
+  }
+  .cover .meta {
+    font-size: 11pt;
+    color: #c8ddf0;
+    line-height: 2;
+  }
+  .cover .logo-bar {
+    margin-top: 80px;
+    font-size: 10pt;
+    color: #7aa8cc;
+    border-top: 1px solid #3a6a9c;
+    padding-top: 20px;
+    width: 100%;
+  }
+  .content {
+    padding: 50px 60px;
+  }
+  h1 { font-size: 20pt; color: #1a3a5c; margin-top: 36px; margin-bottom: 8px; border-bottom: 2px solid #1a3a5c; padding-bottom: 6px; }
+  h2 { font-size: 15pt; color: #1a3a5c; margin-top: 28px; margin-bottom: 6px; }
+  h3 { font-size: 12pt; color: #2a5a8c; margin-top: 20px; margin-bottom: 4px; }
+  p { margin: 8px 0 12px 0; }
+  ul { margin: 6px 0 12px 0; padding-left: 22px; }
+  li { margin-bottom: 5px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0 20px 0;
+    font-size: 10pt;
+  }
+  thead tr { background: #1a3a5c; color: #ffffff; }
+  thead th { padding: 8px 10px; text-align: left; }
+  tbody tr:nth-child(odd)  { background: #f0f5fa; }
+  tbody tr:nth-child(even) { background: #ffffff; }
+  tbody td { padding: 7px 10px; border-bottom: 1px solid #dde6f0; vertical-align: top; }
+  .callout {
+    background: #fff3cd;
+    border-left: 4px solid #f0a500;
+    padding: 10px 14px;
+    margin: 12px 0 18px 0;
+    border-radius: 0 4px 4px 0;
+  }
+  .callout-red {
+    background: #fde8e8;
+    border-left: 4px solid #c0392b;
+  }
+  .callout-blue {
+    background: #e8f0fb;
+    border-left: 4px solid #1a3a5c;
+  }
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin: 16px 0 22px 0;
+  }
+  .stat-box {
+    background: #f0f5fa;
+    border: 1px solid #c0d4e8;
+    border-radius: 6px;
+    padding: 12px 14px;
+    text-align: center;
+  }
+  .stat-box .number { font-size: 22pt; font-weight: 700; color: #1a3a5c; }
+  .stat-box .label  { font-size: 9pt; color: #4a6a8a; margin-top: 4px; }
+  code {
+    background: #f0f4f8;
+    border: 1px solid #ccd8e4;
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-family: 'Courier New', monospace;
+    font-size: 9.5pt;
+  }
+  .section-divider {
+    border: none;
+    border-top: 1px solid #c0d4e8;
+    margin: 30px 0;
+  }
+  .page-break { page-break-before: always; }
+</style>
+</head>
+<body>
+
+<!-- ========== COVER PAGE ========== -->
+<div class="cover">
+  <h1>Chilled Water Plant<br/>Data Exploration &amp; AI Analysis</h1>
+  <div class="subtitle">OpenBlue Platform — Johnson Controls</div>
+  <div class="meta">
+    <strong>Dataset:</strong> FullRawChillerPlantSystem_SAMPLE.xlsx<br/>
+    <strong>Scope:</strong> Dataset Structure · Data Quality · KPI Recommendations<br/>
+    <strong>Date:</strong> April 2026
+  </div>
+  <div class="logo-bar">Individual Assignment — IoT Sensor Data Analysis</div>
+</div>
+
+<!-- ========== MAIN CONTENT ========== -->
+<div class="content">
+
+<h1>1. Dataset Structure &amp; Contents</h1>
+
+<p>The repository contains three Excel files that together describe the chilled water plant's
+operational data and sensor registry.</p>
+
+<h2>1.1 FullRawChillerPlantSystem_SAMPLE.xlsx — Time-Series Sensor Data</h2>
+
+<div class="stat-grid">
+  <div class="stat-box"><div class="number">46,751</div><div class="label">Total data rows</div></div>
+  <div class="stat-box"><div class="number">20</div><div class="label">Columns (signals)</div></div>
+  <div class="stat-box"><div class="number">~5.5 mo</div><div class="label">Date range (Jun–Nov 2011)</div></div>
+</div>
+
+<p>Records are sampled at a nominal <strong>3-minute cadence</strong> from
+<strong>2011-06-09 14:54</strong> to <strong>2011-11-26 12:18</strong>.
+Each row captures a snapshot of the entire chiller plant at that instant.</p>
+
+<table>
+  <thead><tr><th>Column Group</th><th>Signal Names</th><th>Physical Meaning</th></tr></thead>
+  <tbody>
+    <tr><td>Condenser Water Loop</td><td><code>CondenserWaterReturnTemp</code><br/><code>CondenserWaterSupplyTemp</code></td><td>Water temperatures entering and leaving the cooling towers</td></tr>
+    <tr><td>Chiller Plant System</td><td><code>CP_ChillerPlantSystem_Efficiency</code><br/><code>CP_ChillerPlantSystem_kW</code></td><td>Overall plant efficiency (COP/kW per ton) and total power draw</td></tr>
+    <tr><td>Chilled Water Pumps</td><td><code>CP_TotalChilledWaterPump_Efficiency</code><br/><code>CP_TotalChilledWaterPump_kW</code></td><td>Pump efficiency and power serving building cooling coils</td></tr>
+    <tr><td>Chillers (Total)</td><td><code>CP_TotalChiller_Efficiency</code><br/><code>CP_TotalChiller_kW</code></td><td>Aggregate chiller performance across all chiller units</td></tr>
+    <tr><td>Condenser Water Pumps</td><td><code>CP_TotalCondenserWaterPump_Efficiency</code><br/><code>CP_TotalCondenserWaterPump_kW</code></td><td>Pump power circulating water through cooling towers</td></tr>
+    <tr><td>Cooling Tower System</td><td><code>CP_TotalCoolingTowerSystem_Efficiency</code><br/><code>CP_TotalCoolingTowerSystem_kW</code></td><td>Fan/spray system rejecting heat to atmosphere</td></tr>
+    <tr><td>Weather Station 1 &amp; 2</td><td>Humidity, Wet-bulb Temp, Dry-bulb Temp (×2)</td><td>Redundant outdoor weather sensors for cross-validation</td></tr>
+  </tbody>
+</table>
+
+<h2>1.2 uwc_meta.xlsx — Building Sensor Registry</h2>
+
+<p>Contains <strong>988 sensor point definitions</strong> for the broader building system (not just the chiller plant).
+Each row maps a raw BACnet UID to human-readable names, location, equipment tag, and data class.</p>
+
+<table>
+  <thead><tr><th>Category</th><th>Count</th><th>Location Breakdown (top)</th></tr></thead>
+  <tbody>
+    <tr><td>VAV Zone Airflow</td><td>343</td><td rowspan="5">BB: 291 &nbsp;·&nbsp; BD: 212 &nbsp;·&nbsp; BC: 122<br/>BA: 115 &nbsp;·&nbsp; CP: 73 &nbsp;·&nbsp; IB: 69<br/>BH: 64 &nbsp;·&nbsp; SC: 42</td></tr>
+    <tr><td>VAV Zone Temperature</td><td>342</td></tr>
+    <tr><td>Airside</td><td>230</td></tr>
+    <tr><td>Chiller Plant</td><td>54</td></tr>
+    <tr><td>Chiller Plant System</td><td>19</td></tr>
+  </tbody>
+</table>
+
+<h2>1.3 uwc_pm_meta.xlsx — Power Meter Registry</h2>
+
+<p>Lists <strong>78 power meter points</strong> covering the building's electrical submeter hierarchy.</p>
+
+<table>
+  <thead><tr><th>Meter Type</th><th>Count</th></tr></thead>
+  <tbody>
+    <tr><td>AHU Submeters</td><td>36</td></tr>
+    <tr><td>Lighting Submeters</td><td>22</td></tr>
+    <tr><td>Block (Main) Meters</td><td>10</td></tr>
+    <tr><td>Section Submeters</td><td>6</td></tr>
+    <tr><td>"LIghtingSubmeter" (typo variant)</td><td>4</td></tr>
+  </tbody>
+</table>
+
+<hr class="section-divider"/>
+<div class="page-break"></div>
+
+<h1>2. Data Quality Issues, Missing Data &amp; Anomalies</h1>
+
+<h2>2.1 Schema / Structural Problems</h2>
+
+<div class="callout callout-red">
+  <strong>Missing column header for timestamp.</strong> The first column (the datetime index) has
+  <code>None</code> as its header. Any automated script or pipeline that reads this file by
+  column name will silently skip or misprocess the timestamps.
+</div>
+
+<ul>
+  <li><strong>Ghost empty column:</strong> Column index 19 is labelled <code>Unnamed: 0</code> and
+      contains no data in any row — a pandas export artifact. It adds noise and may confuse
+      tools that infer column count from headers.</li>
+  <li><strong>No units documented:</strong> It is never stated in the file whether temperatures are
+      °C or °F, or whether efficiency is expressed as COP, kW/ton, or another metric.
+      (Context strongly suggests °C and a dimensionless COP ratio capped at 2.0, but
+      this must be assumed by the analyst.)</li>
+</ul>
+
+<h2>2.2 Zeros Used as a "No Data" Sentinel</h2>
+
+<div class="callout">
+  <strong>14.5% of all rows (6,781 rows)</strong> have every sensor value equal to exactly 0.
+  These are not valid physical readings — 0°C condenser water is implausible for a
+  tropical/summer climate — yet the file uses 0 as a proxy for "system offline" or
+  "sensor not reporting."  This makes it impossible to distinguish a legitimate zero
+  from a missing value without domain knowledge.
+</div>
+
+<table>
+  <thead><tr><th>Column</th><th>Zero Count</th><th>NULL Count</th><th>Valid Readings</th><th>Max Value</th></tr></thead>
+  <tbody>
+    <tr><td>CondenserWaterReturnTemp</td><td>6,787</td><td>0</td><td>39,964</td><td>46.4°C</td></tr>
+    <tr><td>CondenserWaterSupplyTemp</td><td>6,787</td><td>0</td><td>39,964</td><td>41.7°C</td></tr>
+    <tr><td>ChillerPlantSystem_Efficiency</td><td>16,484</td><td>3</td><td>30,264</td><td>2.0</td></tr>
+    <tr><td>ChillerPlantSystem_kW</td><td>13,272</td><td>1</td><td>33,478</td><td>947 kW</td></tr>
+    <tr><td>TotalChilledWaterPump_kW</td><td>13,291</td><td>1</td><td>33,459</td><td>37.0 kW</td></tr>
+    <tr><td>TotalChiller_kW</td><td>16,494</td><td>1</td><td>30,256</td><td>823.5 kW</td></tr>
+    <tr><td>TotalCondenserWaterPump_kW</td><td>14,136</td><td>2</td><td>32,613</td><td>34.6 kW</td></tr>
+    <tr><td>TotalCoolingTowerSystem_kW</td><td>16,118</td><td>1</td><td>30,632</td><td>61.0 kW</td></tr>
+    <tr><td>WeatherStation1_OutdoorTemp</td><td>7,061</td><td>3</td><td>39,687</td><td>32.6°C</td></tr>
+    <tr><td>WeatherStation2_OutdoorTemp</td><td>7,061</td><td>3</td><td>39,687</td><td>32.9°C</td></tr>
+  </tbody>
+</table>
+
+<p>Note also the <strong>first 13 rows</strong> (2011-06-09 14:54–15:30) are all-zero — logging
+started before the system was operational.</p>
+
+<h2>2.3 Frozen / Stale Sensor Data</h2>
+
+<div class="callout callout-red">
+  The <code>CondenserWaterReturnTemp</code> column reports the <strong>identical value for
+  3,283 consecutive rows</strong> — approximately <strong>6.8 continuous days</strong> —
+  starting 2011-06-17 16:51. A real sensor reading physically cannot stay perfectly constant
+  for that duration. This is a data logger or communication freeze, not a valid steady state.
+  The same freeze affects all other columns simultaneously (they all show identical all-zero
+  blocks), confirming a logging outage rather than a coincidental operational plateau.
+</div>
+
+<h2>2.4 Timestamp Gaps (Missing Records)</h2>
+
+<p>The nominal 3-minute cadence is broken in <strong>35 places</strong>. Selected gaps:</p>
+
+<table>
+  <thead><tr><th>Gap Start</th><th>Gap End</th><th>Missing Duration</th></tr></thead>
+  <tbody>
+    <tr><td>2011-07-17 08:48</td><td>2011-07-18 08:42</td><td><strong>1,434 min (≈1 full day)</strong></td></tr>
+    <tr><td>2011-07-19 17:57</td><td>2011-07-20 10:09</td><td><strong>972 min (≈16 hours)</strong></td></tr>
+    <tr><td>2011-07-18 13:15</td><td>2011-07-18 15:33</td><td>138 min</td></tr>
+    <tr><td>2011-07-20 10:12</td><td>2011-07-20 11:24</td><td>72 min</td></tr>
+    <tr><td>2011-07-19 14:48</td><td>2011-07-19 15:42</td><td>54 min</td></tr>
+    <tr><td>2011-07-04 14:09</td><td>2011-07-04 14:30</td><td>21 min</td></tr>
+  </tbody>
+</table>
+
+<p>Any naive cumulative energy calculation or rolling-average KPI that does not account for
+these gaps will produce incorrect results.</p>
+
+<h2>2.5 Efficiency Values Hard-Capped at 2.0</h2>
+
+<div class="callout">
+  All five efficiency columns share a hard ceiling of exactly <strong>2.0</strong>.
+  During high-performance operating periods, the true COP may exceed this value but is
+  simply not recorded. The cap affects 33–262 readings per channel (up to 0.9% of
+  valid readings), making peak-efficiency analysis unreliable.
+</div>
+
+<h2>2.6 Physical Consistency Flag</h2>
+
+<p>Some rows show <code>TotalChiller_kW = 0</code> while
+<code>TotalCondenserWaterPump_kW &gt; 0</code>. Running condenser pumps with no chiller load
+is unusual and likely represents startup/shutdown transition states, but the data provides
+no mode flag to confirm this interpretation.</p>
+
+<h2>2.7 Power Meter Metadata Typo</h2>
+
+<p>In <code>uwc_pm_meta.xlsx</code>, the <code>PointType</code> field contains both
+<code>"LightingSubmeter"</code> (22 records) and <code>"LIghtingSubmeter"</code> (4 records —
+capital I). Any GROUP BY or filter on this field will silently miss 4 meters, under-reporting
+lighting energy by roughly 15% of that submeter category.</p>
+
+<hr class="section-divider"/>
+<div class="page-break"></div>
+
+<h1>3. Recommended KPIs for JCI OpenBlue</h1>
+
+<h2>3.1 Energy Efficiency KPIs</h2>
+
+<table>
+  <thead><tr><th>KPI</th><th>Definition</th><th>Source Signals</th><th>Why It Matters</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Plant-Level COP</strong></td>
+      <td>Total cooling output (tons) ÷ total electrical input (kW)</td>
+      <td><code>CP_ChillerPlantSystem_kW</code> + chilled water BTU meter</td>
+      <td>Single most important efficiency metric; benchmarks against ASHRAE 90.1</td>
+    </tr>
+    <tr>
+      <td><strong>Chiller-Only COP</strong></td>
+      <td>Chiller cooling output ÷ chiller kW</td>
+      <td><code>CP_TotalChiller_Efficiency</code>, <code>CP_TotalChiller_kW</code></td>
+      <td>Isolates compressor performance from auxiliary loads for fault diagnosis</td>
+    </tr>
+    <tr>
+      <td><strong>Integrated Part-Load Value (IPLV)</strong></td>
+      <td>Weighted-average efficiency across defined load bins (25/50/75/100%)</td>
+      <td>All efficiency + kW columns</td>
+      <td>AHRI 550/590 standard; better real-world metric than rated full-load COP</td>
+    </tr>
+    <tr>
+      <td><strong>Cooling Tower Approach Temperature</strong></td>
+      <td>Condenser supply temp − outdoor wet-bulb temp</td>
+      <td><code>CondenserWaterSupplyTemp</code>, <code>WeatherStation_WetbulbTemp</code></td>
+      <td>Measures tower fouling and fan degradation; tighter approach = better efficiency</td>
+    </tr>
+    <tr>
+      <td><strong>Condenser Water ΔT</strong></td>
+      <td>Return temp − supply temp across the condenser loop</td>
+      <td><code>CondenserWaterReturnTemp</code>, <code>CondenserWaterSupplyTemp</code></td>
+      <td>Low ΔT syndrome indicates poor flow distribution or bypassing</td>
+    </tr>
+    <tr>
+      <td><strong>Specific Fan Power (SFP)</strong></td>
+      <td>Cooling tower kW ÷ condenser water flow rate</td>
+      <td><code>CP_TotalCoolingTowerSystem_kW</code></td>
+      <td>Benchmarks cooling tower fan efficiency independent of load</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3.2 Sustainability KPIs</h2>
+
+<table>
+  <thead><tr><th>KPI</th><th>Definition</th><th>Why It Matters</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>kWh per Cooling Ton-Hour</strong></td>
+      <td>Cumulative plant energy ÷ cumulative cooling delivered</td>
+      <td>Normalised energy intensity; tracks improvement over time or across sites</td>
+    </tr>
+    <tr>
+      <td><strong>Carbon Intensity (kgCO₂/ton-hr)</strong></td>
+      <td>kWh × local grid emission factor</td>
+      <td>Direct input to ESG reporting and net-zero commitments</td>
+    </tr>
+    <tr>
+      <td><strong>Peak Demand Reduction %</strong></td>
+      <td>(Baseline peak kW − actual peak kW) ÷ baseline peak kW</td>
+      <td>Quantifies demand-response and load-shifting value; reduces utility demand charges</td>
+    </tr>
+    <tr>
+      <td><strong>Water Consumption Index</strong></td>
+      <td>Cooling tower make-up water ÷ ton-hours of cooling</td>
+      <td>Water stewardship metric increasingly required in sustainability disclosures</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3.3 Equipment Reliability KPIs</h2>
+
+<table>
+  <thead><tr><th>KPI</th><th>Definition</th><th>Why It Matters</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Sensor Data Availability %</strong></td>
+      <td>Valid (non-zero, non-stale, non-NULL) intervals ÷ total expected intervals</td>
+      <td>Quantifies how much of the data is actually usable; a precondition for all other KPIs</td>
+    </tr>
+    <tr>
+      <td><strong>Equipment Uptime %</strong></td>
+      <td>Hours with chiller/pump kW above minimum threshold ÷ total scheduled hours</td>
+      <td>Traditional reliability metric; baseline for maintenance scheduling</td>
+    </tr>
+    <tr>
+      <td><strong>Stale-Data Event Count</strong></td>
+      <td>Number of incidents where any sensor reports the same value for &gt;N consecutive intervals</td>
+      <td>Flags data logger freezes and sensor communication dropouts before they corrupt analyses</td>
+    </tr>
+    <tr>
+      <td><strong>Timestamp Gap Frequency</strong></td>
+      <td>Count and total duration of missing 3-minute intervals per month</td>
+      <td>Measures logging reliability; gaps invalidate cumulative energy totals</td>
+    </tr>
+    <tr>
+      <td><strong>Efficiency Ceiling Exceedance Rate</strong></td>
+      <td>% of intervals where efficiency = exactly 2.0 (the sensor cap)</td>
+      <td>Flags how often true performance is hidden by the reporting ceiling; prompts sensor range review</td>
+    </tr>
+    <tr>
+      <td><strong>Chiller Load Factor</strong></td>
+      <td>Average chiller kW ÷ rated chiller capacity kW</td>
+      <td>Identifies chronic under-loading (degraded COP) or over-loading (reliability risk)</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr class="section-divider"/>
+
+<h1>4. Key Findings Summary</h1>
+
+<div class="callout callout-blue">
+  <strong>What AI tools typically get right:</strong> Column identification, basic statistics,
+  spotting NULL values, and generating generic KPI lists for chiller plants.
+</div>
+
+<div class="callout callout-red">
+  <strong>What AI tools typically miss:</strong>
+  <ul style="margin:6px 0 0 0;">
+    <li>Zeros-as-sentinel vs. true zeros (requires domain knowledge to distinguish)</li>
+    <li>The 6.8-day frozen sensor run (requires sequence analysis, not just column stats)</li>
+    <li>The missing timestamp header (only visible by inspecting raw cell A1)</li>
+    <li>The efficiency hard cap at 2.0 (appears as a valid max value without context)</li>
+    <li>The metadata typo <code>LIghtingSubmeter</code> (easy to overlook without a GROUP BY)</li>
+    <li>Physical inconsistency between chiller kW = 0 and condenser pump kW &gt; 0</li>
+  </ul>
+</div>
+
+<p style="margin-top:30px; font-size:9pt; color:#666; text-align:center;">
+  Generated from direct programmatic inspection of FullRawChillerPlantSystem_SAMPLE.xlsx,
+  uwc_meta.xlsx, and uwc_pm_meta.xlsx &nbsp;·&nbsp; April 2026
+</p>
+
+</div><!-- end .content -->
+</body>
+</html>
